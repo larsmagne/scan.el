@@ -37,13 +37,15 @@
 (defun scan-sleeve (dir &optional complete)
   (interactive "DDirectory: ")
   (let ((suffix "")
+	(part 0)
 	(continue t))
     (while continue
       (let ((spec (scan-type)))
 	(if spec
 	    (scan-sleeve-1 dir spec suffix)
 	  (setq continue nil)))
-      (unless complete
+      (if complete
+	  (setq suffix (format "-%d" (incf part)))
 	(setq continue nil)))))
 
 (defun scan-sleeve-1 (dir spec suffix)
