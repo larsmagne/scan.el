@@ -1,0 +1,35 @@
+#!/bin/sh
+
+dir="$1"
+width="$2"
+height="$3"
+left="$4"
+top="$5"
+suf="$6"
+
+if [ "$dir" = "" -o "$dir" = "mm" -o "$dir" = "mm" ]; then
+    echo "Usage: scan DIR WIDTH HEIGHT"
+    exit
+fi
+
+cd "$dir"
+norm="pnmnorm -bvalue 30 -wvalue 235"
+
+scanimage -d epson --mode=color --resolution 400dpi\
+    -x $width -y $height -l $left -t $top |\
+     pnmflip -topbottom -leftright | pnmtotiff > sleeve.ppm
+
+tifftopnm < sleeve.ppm | $norm | cjpeg > sleeve$suf.jpg
+
+tifftopnm < sleeve.ppm | $norm | pnmscale -xsize 700 | cjpeg \
+    -quality 90 > "$dir/display$suf.jpg"
+
+tifftopnm < sleeve.ppm | $norm | pnmscale -xsize 200 | pnmtopng \
+    > thumbnail$suf.png
+
+tifftopnm < sleeve.ppm | $norm | pnmscale -xsize 100 | pnmtopng \
+    > micro$suf.png
+
+tifftopnm < sleeve.ppm | $norm | pnmtopng > sleeve.png
+
+rm -f sleeve.tiff
