@@ -42,38 +42,22 @@
     (while continue
       (let ((spec (scan-type)))
 	(if spec
-	    (scan-sleeve-1 dir spec suffix)
+	    (scan-sleeve-1 dir spec suffix (not complete))
 	  (setq continue nil)))
       (if complete
 	  (setq suffix (format "-%d" (incf part)))
 	(setq continue nil)))))
 
-(defun scan-sleeve-1 (dir spec suffix)
+(defun scan-sleeve-1 (dir spec suffix async)
   (message "Scanning sleeve %s" spec)
   (let ((default-directory dir))
-    (shell-command (concat
-		    (format scan-command
-			    (number-to-string (nth 0 spec))
-			    (number-to-string (nth 1 spec))
-			    (number-to-string (or (nth 2 spec) 0))
-			    (number-to-string (or (nth 3 spec) 0)))
-		    " | pnmtotiff > sleeve.tiff"))
-    (let ((filter (concat "tifftopnm sleeve.tiff | "
-			  scan-filter)))
-      (shell-command
-       (format "%s | cjpeg > sleeve%s.jpg" filter suffix))
-      (shell-command
-       (format "%s | pnmscale -xsize 700 | cjpeg -quality 90 > display%s.jpg"
-	       filter suffix))
-      (shell-command
-       (format "%s | pnmscale -xsize 200 | pnmtopng > thumbnail%s.png"
-	       filter suffix))
-      (shell-command
-       (format "%s | pnmscale -xsize 100 | pnmtopng > micro%s.png"
-	       filter suffix))
-      (shell-command
-       (format "%s | pnmtopng > sleeve%s.png" filter suffix))
-      (delete-file "sleeve.tiff"))))
+    (call-process "scan-sleeve" nil (and async 0) nil
+		  dir
+		  (number-to-string (nth 0 spec))
+		  (number-to-string (nth 1 spec))
+		  (number-to-string (or (nth 2 spec) 0))
+		  (number-to-string (or (nth 3 spec) 0))
+		  suffix)))
 
 (defun scan-type ()
   ;; The numbers are in millimeters, and are width/height, with

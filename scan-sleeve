@@ -7,8 +7,8 @@ left="$4"
 top="$5"
 suf="$6"
 
-if [ "$dir" = "" -o "$dir" = "mm" -o "$dir" = "mm" ]; then
-    echo "Usage: scan DIR WIDTH HEIGHT"
+if [ "$dir" = "" -o "$top" = "" ]; then
+    echo "Usage: scan DIR WIDTH HEIGHT LEFT TOP [suffix]"
     exit
 fi
 
