@@ -1,4 +1,4 @@
-;;; scan.el --- Editing Sound Files
+;;; scan.el --- Scanning Sleeves
 ;; Copyright (C) 2001, 2002, 2003, 2010, 2011 Lars Magne Ingebrigtsen
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -63,11 +63,11 @@
   ;; The numbers are in millimeters, and are width/height, with
   ;; optional start-x/start-y parameters.
   (let ((types '((?\r "cd" 117 117)
-		 (?C "cd" 114 114)
 		 (?n "cdsingle" 138 123)
+		 (?C "cdsingle other way" 123 138)
 		 (?q "square" 120 123)
 		 (?Q "bigger square" 135 135)
-		 (?L "clam" 124 125)
+		 (?m "clam" 124 125)
 		 (?M "mego" 140 165)
 		 (?I "slim" 135 116)
 		 (?h "high" 120 170)
@@ -81,6 +81,7 @@
 		 (?R "raster-noton" 150 190)
 		 (?3 "3 inch" 85 85)
 		 (?l "lp" 310 310)
+		 (?L "lp" 320 320)
 		 (?i "inner lp" 304 304)
 		 (?7 "7 inch" 180 180)
 		 (?8 "7 inch label" 120 120 30 30)
