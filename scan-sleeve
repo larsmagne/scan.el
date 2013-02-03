@@ -30,6 +30,6 @@ tifftopnm < sleeve.ppm | $norm | pnmscale -xsize 200 | pnmtopng \
 tifftopnm < sleeve.ppm | $norm | pnmscale -xsize 100 | pnmtopng \
     > micro$suf.png
 
-tifftopnm < sleeve.ppm | $norm | pnmtopng > sleeve.png
+tifftopnm < sleeve.ppm | $norm | pnmtopng > "sleeve$suf.png"
 
 rm -f sleeve.tiff
