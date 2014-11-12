@@ -63,6 +63,9 @@
   ;; The numbers are in millimeters, and are width/height, with
   ;; optional start-x/start-y parameters.
   (let* ((types '((?\r "cd" 117 117)
+		  (?b "cd booklet spread" 234 117)
+		  (?c "naked cd" 119 119)
+		  (?B "cd backing board" 148 116)
 		  (?n "cdsingle" 138 123)
 		  (?C "cdsingle other way" 123 138)
 		  (?q "square" 120 123)
@@ -95,26 +98,28 @@
 	(assq choice types)
       (cddr (assq choice types)))))
 
-(defvar scan-directory "/data/tmp")
+(defvar scan-directory "/stage/scans")
 
 (defun scan-with-name (name)
   "Prompt for an item name (like CAD408), create the directory and scan."
   (interactive "sItem name: ")
   (let ((dir (expand-file-name name scan-directory)))
     (unless (file-exists-p dir)
-      (make-directory dir)
-      (let ((part 0)
-	    (continue t))
-	(while continue
-	  (let ((spec (scan-type t)))
-	    (if (not spec)
-		(setq continue nil)
-	      (shell-command
-	       (format "scanimage --mode=color -d epson --resolution 300dpi -t %s -l %s -x %s -y %s | pnmflip -topbottom -leftright | pnmtotiff > %s/%s-%d-%c.tiff"
-		       (or (nth 4 spec) 0)
-		       (or (nth 5 spec) 0)
-		       (nth 2 spec) (nth 3 spec)
-		       dir name (incf part)
+      (make-directory dir))
+    (let ((part 0)
+	  (continue t))
+      (while continue
+	(let ((spec (scan-type t)))
+	  (if (not (nth 2 spec))
+	      (setq continue nil)
+	    (shell-command
+	     (format "scanimage --mode=color -d epson --resolution 300dpi -t %s -l %s -x %s -y %s | pnmflip -topbottom -leftright | pnmtotiff > %s/%s-%d-%c.tiff"
+		     (or (nth 4 spec) 0)
+		     (or (nth 5 spec) 0)
+		     (nth 2 spec) (nth 3 spec)
+		     dir name (incf part)
+		     (if (= (nth 0 spec) 13)
+			 ?C
 		       (nth 0 spec))))))))))
 
 (provide 'scan)
