@@ -34,10 +34,12 @@
 (defvar scan-filter "pnmnorm -bvalue 20 -wvalue 235"
   "Command to do post-processing on the image.")
 
-(defun scan-sleeve (dir &optional complete)
+(defun scan-sleeve (dir &optional complete start-number)
   (interactive "DDirectory: ")
-  (let ((suffix "")
-	(part 0)
+  (let ((suffix (if start-number
+		    (format "-%d" start-number)
+		  ""))
+	(part (or start-number 0))
 	(continue t))
     (while continue
       (let ((spec (scan-type)))
@@ -92,6 +94,8 @@
 		  (?1 "10 inch" 258 258)
 		  (?2 "10 inch label" 130 130 60 60)
 		  (?a "label" 140 140 80 80)
+		  (?A "a4" 210 297)
+		  (?S "a4 sideways" 297 420)
 		  (?z "end")))
 	 (choice (gnus-multiple-choice "Sleeve type" types)))
     (if return-choice
