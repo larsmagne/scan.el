@@ -34,7 +34,8 @@
 (defvar scan-filter "pnmnorm -bvalue 20 -wvalue 235"
   "Command to do post-processing on the image.")
 
-(defun scan-sleeve (dir &optional complete start-number)
+(defun scan-sleeve (dir &optional complete start-number
+			callback)
   (interactive "DDirectory: ")
   (let ((suffix (if start-number
 		    (format "-%d" start-number)
@@ -46,9 +47,13 @@
 	(if spec
 	    (scan-sleeve-1 dir spec suffix (not complete))
 	  (setq continue nil)))
+      (when callback
+	(funcall callback))
       (if complete
 	  (setq suffix (format "-%d" (incf part)))
-	(setq continue nil)))))
+	(setq continue nil)))
+    (when callback
+      (funcall callback))))
 
 (defun scan-sleeve-1 (dir spec suffix async)
   (message "Scanning sleeve %s" spec)
