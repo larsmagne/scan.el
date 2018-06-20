@@ -101,6 +101,7 @@
 		  (?l "lp" 310 310)
 		  (?L "bigger lp" 320 320)
 		  (?i "inner lp" 304 304)
+		  (?K "smaller LP-like package" 304 280)
 		  (?p "postcard portrait" 103 145)
 		  (?p "postcard landscape" 145 103)
 		  (?f "7 inch flexi" 157 160)
