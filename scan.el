@@ -28,9 +28,6 @@
 (require 'cl)
 (require 'gnus-util)
 
-(defvar scan-command "scanimage --mode=color -d epson --resolution 300dpi -x %s -y %s -l %s -t %s | pnmflip -topbottom -leftright"
-  "Command to scan an image.")
-
 (defvar scan-filter "pnmnorm -bvalue 20 -wvalue 235"
   "Command to do post-processing on the image.")
 
@@ -57,8 +54,10 @@
 
 (defun scan-sleeve-1 (dir spec suffix async)
   (message "Scanning sleeve %s" spec)
-  (let ((default-directory dir))
+  (let ((default-directory dir)
+	(device (scan-find-device)))
     (call-process "scan-sleeve" nil (and async 0) nil
+		  (format "epson2:libusb:%s:%s" (car device) (cdr device))
 		  dir
 		  (number-to-string (nth 0 spec))
 		  (number-to-string (nth 1 spec))
@@ -75,8 +74,8 @@
 		  (?B "cd backing board" 148 116)
 		  (?n "cdsingle" 138 123)
 		  (?C "cdsingle other way" 123 138)
-		  (?q "square" 120 123)
-		  (?W "smaller big square" 133 132)
+		  (?q "square" 130 130)
+		  (?W "smaller big square" 123 122)
 		  (?Q "bigger square" 134 134)
 		  (?m "clam" 124 125)
 		  (?M "mego" 140 165)
@@ -101,13 +100,14 @@
 		  (?l "lp" 310 310)
 		  (?L "bigger lp" 320 320)
 		  (?i "inner lp" 304 304)
-		  (?K "smaller LP-like package" 304 280)
+		  (?K "smaller LP package" 304 280)
 		  (?p "postcard portrait" 103 145)
 		  (?p "postcard landscape" 145 103)
-		  (?f "7 inch flexi" 157 160)
+		  (?f "7 inch flexi" 150 148)
 		  (?7 "7 inch" 180 180)
 		  (?8 "7 inch label" 120 120 30 30)
 		  (?w "Wide 7 inch" 185 180)
+		  (?4 "9 inch" 230 230)
 		  (?1 "10 inch" 258 258)
 		  (?2 "10 inch label" 130 130 60 60)
 		  (?a "label" 140 140 80 80)
@@ -123,10 +123,16 @@
 
 (defvar scan-directory "/stage/scans")
 
+(defun scan-find-device ()
+  (let ((bits (split-string (file-truename "/dev/epson") "/")))
+    (cons (car (last bits 2))
+	  (car (last bits 1)))))
+
 (defun scan-with-name (name)
   "Prompt for an item name (like CAD408), create the directory and scan."
   (interactive "sItem name: ")
-  (let ((dir (expand-file-name name scan-directory)))
+  (let ((dir (expand-file-name name scan-directory))
+	(device (scan-find-device)))
     (unless (file-exists-p dir)
       (make-directory dir))
     (let ((part 0)
@@ -136,7 +142,9 @@
 	  (if (not (nth 2 spec))
 	      (setq continue nil)
 	    (shell-command
-	     (format "scanimage --mode=color -d epson --resolution 300dpi -t %s -l %s -x %s -y %s | pnmflip -topbottom -leftright | pnmtotiff > %s/%s-%d-%c.tiff"
+	     (format "scanimage --mode=color -d epson:libusb:%s:%s --resolution 300dpi -t %s -l %s -x %s -y %s | pnmflip -topbottom -leftright | pnmtotiff > %s/%s-%d-%c.tiff"
+		     (car device)
+		     (cdr device)
 		     (or (nth 4 spec) 0)
 		     (or (nth 5 spec) 0)
 		     (nth 2 spec) (nth 3 spec)
