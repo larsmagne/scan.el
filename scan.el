@@ -76,6 +76,7 @@
 		  (?C "cdsingle other way" 123 138)
 		  (?q "square" 130 130)
 		  (?W "smaller big square" 123 122)
+		  (?F "Fabriclive" 130 122)
 		  (?Q "bigger square" 134 134)
 		  (?m "clam" 124 125)
 		  (?M "mego" 140 165)
