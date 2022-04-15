@@ -1,21 +1,24 @@
 #!/bin/sh
 
-dir="$1"
-width="$2"
-height="$3"
-left="$4"
-top="$5"
-suf="$6"
+device="$1"
+dir="$2"
+width="$3"
+height="$4"
+left="$5"
+top="$6"
+suf="$7"
 
 if [ "$dir" = "" -o "$top" = "" ]; then
-    echo "Usage: scan DIR WIDTH HEIGHT LEFT TOP [suffix]"
+    echo "Usage: scan DEVICE DIR WIDTH HEIGHT LEFT TOP [suffix]"
     exit
 fi
 
 cd "$dir"
 norm="pnmnorm -bvalue 30 -wvalue 235"
 
-scanimage -d epson --mode=color --resolution 400dpi\
+echo "scanimage -d $device --mode=color --resolution 600dpi -x $width -y $height -l $left -t $top" >> /tmp/sc
+
+scanimage -d $device --mode=color --resolution 400dpi\
     -x $width -y $height -l $left -t $top |\
      pnmflip -topbottom -leftright | pnmtotiff > sleeve.ppm
 
@@ -32,4 +35,4 @@ tifftopnm < sleeve.ppm | $norm | pnmscale -xsize 100 | pnmtopng \
 
 tifftopnm < sleeve.ppm | $norm | pnmtopng > "sleeve$suf.png"
 
-rm -f sleeve.tiff
+rm -f sleeve.tiff sleeve.ppm
