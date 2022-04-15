@@ -47,7 +47,7 @@
       (when callback
 	(funcall callback))
       (if complete
-	  (setq suffix (format "-%d" (incf part)))
+	  (setq suffix (format "-%d" (cl-incf part)))
 	(setq continue nil)))
     (when callback
       (funcall callback))))
@@ -158,7 +158,7 @@
 		     (or (nth 4 spec) 0)
 		     (or (nth 5 spec) 0)
 		     (nth 2 spec) (nth 3 spec)
-		     dir name (incf part)
+		     dir name (cl-incf part)
 		     (if (= (nth 0 spec) 13)
 			 ?C
 		       (nth 0 spec))))))))))
