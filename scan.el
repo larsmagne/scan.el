@@ -69,10 +69,11 @@
   ;; The numbers are in millimeters, and are width/height, with
   ;; optional start-x/start-y parameters.
   (let* ((types '((?\r "cd" 117 117)
+		  (?e "eli" 238 235)		      
 		  (?b "cd booklet spread" 234 117)
 		  (?c "naked cd" 119 119)
 		  (?B "cd backing board" 148 116)
-		  (?n "cdsingle" 136 124)
+		  (?n "cdsingle" 136 122)
 		  (?C "cdsingle other way" 123 138)
 		  (?q "square" 130 130)
 		  (?W "smaller big square" 123 122)
@@ -153,6 +154,31 @@
 	      (setq continue nil)
 	    (shell-command
 	     (format "scanimage --mode=color -d epson:libusb:%s:%s --resolution 300dpi -t %s -l %s -x %s -y %s | pnmflip -topbottom -leftright | pnmtotiff > %s/%s-%d-%c.tiff"
+		     (car device)
+		     (cdr device)
+		     (or (nth 4 spec) 0)
+		     (or (nth 5 spec) 0)
+		     (nth 2 spec) (nth 3 spec)
+		     dir name (cl-incf part)
+		     (if (= (nth 0 spec) 13)
+			 ?C
+		       (nth 0 spec))))))))))
+
+(defun scan-pages (name)
+  "Prompt for an item name (like MARTIN), create the directory and scan."
+  (interactive "sItem name: ")
+  (let ((dir (expand-file-name name scan-directory))
+	(device (scan-find-device)))
+    (unless (file-exists-p dir)
+      (make-directory dir))
+    (let ((part 0)
+	  (continue t))
+      (while continue
+	(let ((spec (scan-type t)))
+	  (if (not (nth 2 spec))
+	      (setq continue nil)
+	    (shell-command
+	     (format "scanimage --mode=color -d epson2:libusb:%s:%s --resolution 600dpi -t %s -l %s -x %s -y %s | pnmflip -topbottom -leftright | pnmtotiff -lzw > %s/%s-%d-%c.tiff"
 		     (car device)
 		     (cdr device)
 		     (or (nth 4 spec) 0)
