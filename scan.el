@@ -25,7 +25,6 @@
 
 ;;; Code:
 
-(require 'cl)
 (require 'gnus-util)
 
 (defvar scan-filter "pnmnorm -bvalue 20 -wvalue 235"
